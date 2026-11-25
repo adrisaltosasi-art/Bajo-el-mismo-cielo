@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070914">
+<title>Bajo el mismo cielo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070914;color:#f4e8c9;font-family:Georgia,serif}
+main{min-height:100vh;display:grid;place-items:center;padding:30px 18px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#1b2440 0,#0b1022 48%,#050711 100%)}
+#stars{position:absolute;inset:0;width:100%;height:100%}.wrap{position:relative;z-index:1;width:min(100%,620px);text-align:center}
+.kicker{font:11px Arial,sans-serif;letter-spacing:5px;color:#d8b66a;text-transform:uppercase}
+h1{font-size:clamp(38px,9vw,62px);font-weight:400;margin:18px 0 10px;text-shadow:0 0 25px #d8b66a55}
+.sub{font-size:16px;color:#d9d1c0;line-height:1.6}
+.sky{width:min(88vw,460px);aspect-ratio:1.12;margin:30px auto 22px;border:1px solid #d8b66a77;border-radius:50%;overflow:hidden;box-shadow:0 0 55px #b58b3c22,inset 0 0 45px #b58b3c18;background:#0a1022}
+.sky svg{width:100%;height:100%}.coords{font:10px Arial,sans-serif;letter-spacing:1px;fill:#f2d99b}
+.caption{font-size:18px;line-height:1.5;margin:12px auto 25px}
+button{border:1px solid #d8b66a;background:linear-gradient(135deg,#c9a45b,#f0d99d);color:#171321;border-radius:30px;padding:15px 24px;font:600 12px Arial,sans-serif;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+.small{font:11px Arial,sans-serif;color:#aaa6a0;line-height:1.6;max-width:340px;margin:18px auto}
+#ar{display:none;position:fixed;inset:0;background:#000;z-index:5}#camera{width:100%;height:100%;object-fit:cover}#overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#close{position:absolute;top:18px;right:16px;background:#10131ddd;color:#f6e9c7;border-color:#d8b66a}
+#arlabel{position:absolute;bottom:30px;left:15px;right:15px;text-align:center;color:#f5e7c4;text-shadow:0 2px 8px #000;font-size:20px}
+</style>
+</head>
+<body>
+<main><canvas id="stars"></canvas><div class="wrap">
+<div class="kicker">Un secreto entre dos cielos</div>
+<h1>Bajo el mismo cielo</h1>
+<div class="sub">Hay conexiones que no necesitan explicación.</div>
+<div class="sky"><svg viewBox="0 0 440 390" aria-label="Mapa de estrellas con tres puntos conectados">
+<g stroke="#b99a58" stroke-opacity=".65" stroke-width="1.2" fill="none"><path d="M75 105 Q190 42 335 112 L276 280 Q164 324 75 105"/><path d="M75 105 L276 280 L335 112"/><path d="M44 190 Q220 12 395 200" stroke-opacity=".22"/><path d="M220 28V362 M28 195H412" stroke-opacity=".12"/></g>
+<g fill="#fff0c6"><circle cx="46" cy="68" r="1.4"/><circle cx="132" cy="40" r="1"/><circle cx="375" cy="65" r="1.5"/><circle cx="390" cy="250" r="1"/><circle cx="115" cy="325" r="1.5"/><circle cx="320" cy="342" r="1"/><circle cx="185" cy="150" r="1.2"/><circle cx="300" cy="190" r="1.3"/></g>
+<g fill="#ffe8a6"><circle cx="75" cy="105" r="5"/><circle cx="335" cy="112" r="5"/><circle cx="276" cy="280" r="5"/></g>
+<g class="coords"><text x="75" y="87" text-anchor="middle">2°53′ S · 79°00′ O</text><text x="335" y="94" text-anchor="middle">2°10′ S · 79°54′ O</text><text x="276" y="305" text-anchor="middle">0°48′ N · 77°43′ O</text></g>
+<text x="220" y="370" fill="#d8b66a" font-size="9" letter-spacing="4" text-anchor="middle">TRES PUNTOS · UN MISMO CIELO</text>
+</svg></div>
+<div class="caption">Aunque haya distancia,<br>compartimos el mismo cielo.</div>
+<button id="start">Descubrir en realidad aumentada</button>
+<p class="small">Activa la cámara y mira el cielo estrellado sobre tu entorno. El vídeo no se guarda ni se transmite.</p>
+</div></main>
+<section id="ar"><video id="camera" autoplay playsinline muted></video><canvas id="overlay"></canvas><button id="close">Cerrar ✕</button><div id="arlabel">Bajo el mismo cielo ✦</div></section>
+<script>
+const c=document.getElementById('stars'),ctx=c.getContext('2d');let stars=[];
+function resize(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;stars=Array.from({length:160},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.3,a:Math.random()*.7+.2}))}
+function draw(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{ctx.globalAlpha=s.a;ctx.fillStyle='#f4dfaa';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill()});ctx.globalAlpha=1;requestAnimationFrame(draw)}resize();draw();addEventListener('resize',resize);
+const start=document.getElementById('start'),ar=document.getElementById('ar'),video=document.getElementById('camera'),ov=document.getElementById('overlay');let stream;
+function paint(){const d=devicePixelRatio||1;ov.width=innerWidth*d;ov.height=innerHeight*d;const x=ov.getContext('2d');x.clearRect(0,0,ov.width,ov.height);x.scale(d,d);const w=innerWidth,h=innerHeight,pts=[[w*.22,h*.32],[w*.77,h*.36],[w*.61,h*.62]];x.strokeStyle='#e3c477bb';x.lineWidth=1.2;x.shadowColor='#f5d78d';x.shadowBlur=12;x.beginPath();x.moveTo(...pts[0]);x.lineTo(...pts[1]);x.lineTo(...pts[2]);x.closePath();x.stroke();pts.forEach(([px,py])=>{x.beginPath();x.arc(px,py,4,0,Math.PI*2);x.fillStyle='#ffedb8';x.fill();x.beginPath();x.arc(px,py,13,0,Math.PI*2);x.stroke()});x.shadowBlur=0;x.fillStyle='#f5e4b8';x.font='11px Arial';x.textAlign='center';x.fillText('2°53′ S · 79°00′ O',pts[0][0],pts[0][1]-18);x.fillText('2°10′ S · 79°54′ O',pts[1][0],pts[1][1]-18);x.fillText('0°48′ N · 77°43′ O',pts[2][0],pts[2][1]+27)}
+start.onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});video.srcObject=stream;ar.style.display='block';paint()}catch(e){alert('No se pudo acceder a la cámara. Revisa el permiso del navegador e inténtalo de nuevo.')}};
+document.getElementById('close').onclick=()=>{if(stream)stream.getTracks().forEach(t=>t.stop());video.srcObject=null;ar.style.display='none'};
+</script>
+</body></html>
